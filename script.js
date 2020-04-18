@@ -9,5 +9,11 @@ function authenticate() {
     location.href = "https://accounts.spotify.com/authorize?client_id=" + client_id + "&redirect_uri=" + redirect_uri + "&scope=" + scope + "&response_type=token";
 }
 
+if (window.location.toString().split("=").length == 1) {
+    authenticate();
+}
+
+var accessToken = window.location.toString().split("=")[1].split("&")[0];
+
 var spotifyApi = new SpotifyWebApi();
-spotifyApi.setAccessToken('<here_your_access_token>');
+spotifyApi.setAccessToken(accessToken);
