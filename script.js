@@ -1,3 +1,14 @@
+/////////////
+// GLOBALS //
+/////////////
+
+var saved_tracks = [];
+var playlists = [];
+
+////////////////////
+// AUTHENTICATION //
+////////////////////
+
 function authenticate() {
     var client_id = "c298d6f931fc45db88dee8d2c14183bc";
     var redirect_uri = "http%3A%2F%2Fwillhamic.com%2Fplaylisterizer%2Findex.html";
@@ -43,9 +54,39 @@ var accessToken = window.location.toString().split("=")[1].split("&")[0];
 var spotifyApi = new SpotifyWebApi();
 spotifyApi.setAccessToken(accessToken);
 
-spotifyApi.getMySavedTracks()
+//////////////////
+// SAVED TRACKS //
+//////////////////
+
+function getAllSaved() {
+    saved_tracks = [];
+    getSavedOffset(0);
+}
+
+function getSavedOffset(offset) {
+    spotifyApi.getMySavedTracks({limit:50, offset:offset})
     .then(function(data) {
-        console.log('Artist albums', data);
+        console.log(data.items)
+        for (var i = 0; i < data.items.length; i++) {
+            saved_tracks.push(data.items[i]);
+        }
+        if (data.next != null) {
+            getSavedOffset(offset + 50);
+        }
     }, function(err) {
         console.error(err);
     });
+}
+
+///////////////
+// PLAYLISTS //
+///////////////
+
+function getPlaylists() {
+    spotifyApi.getUserPlaylists()
+    .then(function(data) {
+        console.log(data);
+    }, function(err) {
+        console.error(err);
+    });
+}
