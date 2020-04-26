@@ -2,8 +2,8 @@
 // GLOBALS //
 /////////////
 
-var saved_tracks = [];
-var playlists = [];
+var savedTracks = [];
+let playlists = new Map();
 
 ////////////////////
 // AUTHENTICATION //
@@ -83,19 +83,20 @@ function getSavedOffset(offset) {
 ///////////////
 
 function getPlaylists() {
-    saved_tracks = [];
+    savedTracks = [];
     getPlaylistsOffset(0);
 }
 
 function getPlaylistsOffset(offset) {
-    spotifyApi.getUserPlaylists({limit:50, offset:offset})
+    var limit = 20;
+    spotifyApi.getUserPlaylists({limit:limit, offset:offset})
     .then(function(data) {
         console.log(data.items)
         for (var i = 0; i < data.items.length; i++) {
-            savedTracks.push(data.items[i]);
+            playlists.set(data.items[i], []);
         }
         if (data.next != null) {
-            getPlaylistsOffset(offset + 20);
+            getPlaylistsOffset(offset + limit);
         }
     }, function(err) {
         console.error(err);
@@ -106,3 +107,23 @@ function getPlaylistsOffset(offset) {
 // PLAYLIST TRACKS //
 /////////////////////
 
+function getPlaylistTracks(playlist) {
+    savedTracks = [];
+    getPlaylistTracksOffset(playlist, 0);
+}
+
+function getPlaylistTracksOffset(playlist, offset) {
+    var limit = 50;
+    spotifyApi.getPlaylistTracks(playlist.id, {limit:limit, offset:offset})
+    .then(function(data) {
+        console.log(data.items)
+        for (var i = 0; i < data.items.length; i++) {
+            playlists.get(playlist).push(data.items[i]);
+        }
+        if (data.next != null) {
+            getPlaylistTracksOffset(playlist, offset + limit);
+        }
+    }, function(err) {
+        console.error(err);
+    });
+}
