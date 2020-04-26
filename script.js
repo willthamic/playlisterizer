@@ -58,7 +58,7 @@ spotifyApi.setAccessToken(accessToken);
 // SAVED TRACKS //
 //////////////////
 
-function getAllSaved() {
+function getSavedTracks() {
     saved_tracks = [];
     getSavedOffset(0);
 }
@@ -68,7 +68,7 @@ function getSavedOffset(offset) {
     .then(function(data) {
         console.log(data.items)
         for (var i = 0; i < data.items.length; i++) {
-            saved_tracks.push(data.items[i]);
+            savedTracks.push(data.items[i]);
         }
         if (data.next != null) {
             getSavedOffset(offset + 50);
@@ -83,10 +83,26 @@ function getSavedOffset(offset) {
 ///////////////
 
 function getPlaylists() {
-    spotifyApi.getUserPlaylists()
+    saved_tracks = [];
+    getPlaylistsOffset(0);
+}
+
+function getPlaylistsOffset(offset) {
+    spotifyApi.getUserPlaylists({limit:50, offset:offset})
     .then(function(data) {
-        console.log(data);
+        console.log(data.items)
+        for (var i = 0; i < data.items.length; i++) {
+            savedTracks.push(data.items[i]);
+        }
+        if (data.next != null) {
+            getPlaylistsOffset(offset + 20);
+        }
     }, function(err) {
         console.error(err);
     });
 }
+
+/////////////////////
+// PLAYLIST TRACKS //
+/////////////////////
+
